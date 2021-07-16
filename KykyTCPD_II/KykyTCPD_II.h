@@ -233,10 +233,10 @@ protected :
 	void write_com(unsigned char* argin, short len);
 	void write_read_com(unsigned char* argin, unsigned char *argout);
   	HANDLE hCom1;	
-	unsigned short CRC16(const unsigned char argin[], short len);
+	unsigned short CRC16(unsigned char *argin, short len);
 	unsigned short update_crc_16(unsigned short crc, unsigned short mc);
 	void init_crc16_tab(void);
-	unsigned int crc_tab16[256];
+	unsigned short crc_tab16[256];
 	Tango::DevLong FlagDebugIO;
 /*----- PROTECTED REGION END -----*/	//	KykyTCPD_II::Additional Method prototypes
 };

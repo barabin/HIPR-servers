@@ -161,6 +161,7 @@ void KykyTCPD_II::init_device()
 	
 	//	Initialize device
 	FlagDebugIO = 0;
+	init_crc16_tab();
 	if(!simulationMode)
     {
       init_com(); 
@@ -357,13 +358,16 @@ void KykyTCPD_II::read_Frequency(Tango::Attribute &attr)
 //--------------------------------------------------------
 void KykyTCPD_II::read_Current(Tango::Attribute &attr)
 {
-	DEBUG_STREAM << "KykyTCPD_II::read_Current(Tango::Attribute &attr) entering... " << endl;
+	DEBUG_STREAM << "01: KykyTCPD_II::read_Current(Tango::Attribute &attr) entering... " << endl;
+	Sleep(1);
 	/*----- PROTECTED REGION ID(KykyTCPD_II::read_Current) ENABLED START -----*/
 	unsigned char recwbuf[40] = { 0 };
-	unsigned short crc, i;
-	unsigned char adr_buf[8] = {(rS485_addr%0x100), 3, 0x10, 1, 0,1, 0,0};	
-	crc=CRC16(adr_buf,6);
-	adr_buf[6]=crc%0x100; adr_buf[7]=crc/0x100;
+	unsigned short i, crc = 0;
+	unsigned char adr_buf[8] = {(rS485_addr%0x100), 3, 0x10,1, 0,1, 0,0};	
+	crc = CRC16(adr_buf, 6);
+	DEBUG_STREAM << "KykyTCPD_II::read_Current() - CRC = " << crc << endl;
+	Sleep(1);
+	adr_buf[6] = crc % 0x100; adr_buf[7] = crc / 0x100;
 	string str_buf;
 	for (i = 0; i<8; i++){
 		str_buf.append(to_string((unsigned int)adr_buf[i]));
@@ -591,11 +595,11 @@ void KykyTCPD_II::write_read_com(unsigned char* argin, unsigned char *argout)
 	}
 }
 
-unsigned short KykyTCPD_II::CRC16(const unsigned char argin[], short len){
+unsigned short KykyTCPD_II::CRC16(unsigned char *argin, short len){
 	unsigned short i, crc_16_modbus;
 	crc_16_modbus = 0xffff;
 	for(i=0;i<len;i++){
-		crc_16_modbus = update_crc_16(crc_16_modbus, argin[i]);
+		crc_16_modbus = update_crc_16(crc_16_modbus, (unsigned short)argin[i]);
 	}
 	return crc_16_modbus;
 }
@@ -603,7 +607,7 @@ unsigned short KykyTCPD_II::CRC16(const unsigned char argin[], short len){
 unsigned short KykyTCPD_II::update_crc_16(unsigned short crc, unsigned short mc){
 	unsigned short tmp, short_c;
 	tmp = crc ^ mc;
-	crc = (crc>>8) ^ crc_tab16[tmp%0x100];
+	crc = (crc >> 8) ^ crc_tab16[tmp & 0xff];
 	return crc;
 }
 
@@ -612,7 +616,8 @@ void KykyTCPD_II::init_crc16_tab(void){
 	for(i=0;i<256;i++){
 		crc=0; c=i;
 		for(j=0;j<8;j++){
-			if(crc ^ c) crc=(crc>>1) ^ 0xa001;
+			//crc = crc ^ c;
+			if((crc ^ c) & 1) crc = (crc>>1) ^ 0xa001;
 			else crc=crc>>1;
 			c=c>>1;
 		}
