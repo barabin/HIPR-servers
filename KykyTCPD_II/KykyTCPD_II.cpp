@@ -589,7 +589,7 @@ void KykyTCPD_II::write_read_com(unsigned char* argin, unsigned char *argout)
 			str_buf.append(to_string((unsigned int)argout[i]));
 			str_buf.append(" ");
 		}
-		DEBUG_STREAM << "KykyTCPD_II::read_Voltage() - command is: " << str_buf << endl;
+		DEBUG_STREAM << "KykyTCPD_II::WriteReadCOM() - response is: " << str_buf << endl;
 		Sleep(1);
 		DEBUG_STREAM << "n+4: KykyTCPD_II::WriteReadCOM() - bytes returned: = " << err << " , result: " << boolalpha << res << endl;
 	}
