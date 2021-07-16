@@ -299,7 +299,7 @@ void TPM101::read_Temperature(Tango::Attribute &attr)
 	if (!simulationMode)
 	{
 		char str_buf[80] = { 0 };
-		write_read_com(in_Buf, 19, str_buf);
+		write_read_com(in_Buf, 20, str_buf);
 		DEBUG_STREAM << "03: TPM101::read_Temperature() - response is: " << str_buf << endl;
 		Sleep(1);
 		string str_buf2{ str_buf };
@@ -502,12 +502,11 @@ void TPM101::add_dynamic_commands()
 //--------------------------------------------------------
 void TPM101::write_com(const char *argin)
 {
-	DEBUG_STREAM << "n+1: TPM101::WriteCOM()  - " << device_name << endl;
-	Sleep(1);
+	DEBUG_STREAM << "TPM101::WriteCOM()  - " << device_name << endl;
+	
 	//	Add your own code
 	DWORD i;
 	WriteFile(hCom1,argin,strlen(argin), &i,NULL);
-	DEBUG_STREAM << "n+2: TPM101::WriteCOM() - bytes transmitted: " << i << endl;
 }
 
 //--------------------------------------------------------
